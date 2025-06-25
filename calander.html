@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Current Month Calendar</title>
+  <style>
+    .calendar {
+      width: 90%;
+      max-width: 700px; /* adjust as needed */
+      margin: 20px auto; /* centers the table */
+      border-collapse: collapse;
+      background-image: url('https://img.freepik.com/free-vector/watercolor-abstract-floral-background_52683-134424.jpg?semt=ais_hybrid&w=740');
+      background-repeat: no-repeat;
+      background-size: cover;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .calendar caption{
+      background-color: #828080;
+      padding: 7px;
+    }
+    .calendar th{
+        background-color: #b4aeae;
+    }
+    .calendar th, .calendar td{
+        width: 50px;
+        height: 50px;
+        border: 1px solid #000000;
+        text-align: center;
+        padding: 5px;
+    }
+
+    .calendar button{
+       padding: 5px 10px;
+      margin: 0 5px;
+    }
+    .spiral-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: -10px;
+    }
+
+    .spiral-img {
+      width: 100%;
+      max-width: 700px; 
+      display: block;
+      object-fit: contain;
+    }
+        #today {
+      background-color: antiquewhite !important;
+    }
+
+    .event {
+      font-size: 0.75em;
+      margin-top: 4px;
+      padding: 2px;
+      border-radius: 3px;
+      color: white;
+    }
+
+    .event:nth-child(1) { background-color: #007bff; }
+    .event:nth-child(2) { background-color: #28a745; }
+    .event:nth-child(3) { background-color: #dc3545; }
+    .event:nth-child(n+4) { background-color: #6c757d; }
+
+
+
+  </style>
+</head>
+<body>
+<div class="spiral-container">
+  <img src="E:\Calander\spiral.jpg" alt="spiral" class="spiral-img">
+</div>
+  <table class="calendar" id="calendar">
+    <caption>
+        <button onclick="getPreviousMonth()" id="btn">&lt;</button>
+        <span id="monthYear"></span>
+        <button onclick="getNextMonth()" id="btn">&gt;</button>
+    <thead>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+      </tr>
+    </thead>
+    <tbody id="calendar-body">
+     
+    </tbody>
+  </table>
+
+  <script>
+
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth(); 
+      const currentDate = today.getDate();
+      
+      let displayMonth = currentMonth;
+      let displayYear = currentYear;
+
+      const events = [
+        { title: "Team Meeting", date: "2025-06-28", time: "10:00", duration: "1h" },
+        { title: "Demo Launch", date: "2025-06-24", time: "11:00", duration: "2h" },
+        { title: "Webinar", date: "2025-07-01", time: "15:00", duration: "1.5h" },
+      { title: "Code Review", date: "2025-07-01", time: "15:00", duration: "1h" }
+    ];
+
+
+    function getPreviousMonth(){
+      displayMonth--;
+      if(displayMonth<0){
+        displayMonth = 11;
+        displayYear--;
+      }
+      generateCalendar(displayYear, displayMonth);
+    }
+    function getNextMonth(){
+      displayMonth++;
+      if(displayMonth>11){
+        displayMonth = 0;
+        displayYear++;
+      }
+      generateCalendar(displayYear, displayMonth);
+    }
+  
+    function generateCalendar(year, month) {
+       const firstDay = new Date(year, month, 1).getDay(); 
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      
+      document.getElementById("monthYear").innerHTML = `<strong>${monthNames[month]} ${year}</strong>`;
+
+      const calendarBody = document.getElementById("calendar-body");
+      calendarBody.innerHTML = ""; 
+
+      let date = 1;
+      for (let i = 0; i < 6; i++) { 
+        const row = document.createElement("tr");
+
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement("td");
+          if (i === 0 && j < firstDay) {
+            cell.innerHTML = ""; 
+          } else if (date > daysInMonth) {
+            break; 
+          } else {
+            const cellDate = new Date(year, month, date);
+            const dateStr = cellDate.toISOString().split('T')[0];
+
+            let dateEvents = [];
+            for (let ev of events) {
+              if (ev.date === dateStr) {
+              dateEvents.push(ev);
+              }
+            }
+            cell.innerHTML = `<strong>${date}</strong>`;
+           for (let i = 0; i < dateEvents.length; i++) {
+              const ev = dateEvents[i]; 
+              const div = document.createElement("div");
+              div.className = "event";
+              div.innerText = ev.title + " (" + ev.time + ")"; 
+              cell.appendChild(div); 
+            }
+            if(date == currentDate && month == currentMonth && year == currentYear){
+                cell.id = "today";
+                cell.style.backgroundColor = "antiquewhite";
+            }
+            date++;
+          }
+          row.appendChild(cell);
+        }
+        calendarBody.appendChild(row);
+
+        if (date > daysInMonth) {
+          break;
+        }
+      }
+     
+    }
+   
+   
+    window.onload = () => generateCalendar(displayYear, displayMonth);
+  </script>
+
+</body>
+</html>
